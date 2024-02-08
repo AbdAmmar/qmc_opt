@@ -8,7 +8,7 @@ import time
 import numpy as np
 
 from modif_powell_imp import my_fmin_powell
-from utils import make_atom_map, f, run_tcscf
+from utils import make_atom_map, f_envSumGauss_j1eGauss, run_tcscf, clear_tcscf_orbitals
 from jast_param import get_env_coef, get_env_expo, get_j1e_size, get_j1e_coef, get_j1e_expo, get_mu
 from jast_param import set_env_coef, set_env_expo, set_j1e_size, set_j1e_coef, set_j1e_expo, set_mu
 import globals
@@ -38,40 +38,32 @@ if __name__ == '__main__':
     n_nuc = len(atom_map)  # nb of nuclei withou repitition
     print(' nb of unique nuclei = {}'.format(n_nuc))
 
-    #j1e_size = get_j1e_size(ezfio)
-    #x = get_j1e_expo(j1e_size, atom_map, ezfio)
-    #print(x)
-    #x = [0.25, 0.5, 1.0, 100.0, 200.0, 300.0, 3.5, 6.5, 11.5, 2.5, 5.0, 7.5]
-    #set_j1e_expo(x, j1e_size, atom_map, ezfio)
-    #x = get_j1e_expo(j1e_size, atom_map, ezfio)
-    #print(x)
+    j1e_size = get_j1e_size(ezfio)
 
-    e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
-    print(e_tcscf, c_tcscf)
+    n_par = 3 * j1e_size * n_nuc
+    print(' nb of parameters = {}'.format(n_par))
 
-
-    #n_par = n_nuc + 1 # e-e parameter b
-    #print(' nb of parameters = {}'.format(n_par))
+    x_min = [(0.1) for _ in range(2*j1e_size*n_nuc), (-9.9) for _ in range(j1e_size*n_nuc)] 
+    x_max = [(9.9) for _ in range(2*j1e_size*n_nuc), (-0.1) for _ in range(j1e_size*n_nuc)]
+    print(' x in bounded between:')
+    print(x_min)
+    print(x_max)
 
     sys.stdout.flush()
 
-    #n_par = n_nuc + 1 # e-e parameter b
-    #print(' nb of parameters = {}'.format(n_par))
-    #x_min = [(0.001) for _ in range(n_par)] 
-    #x_max = [(9.999) for _ in range(n_par)]
+    opt = my_fmin_powell( f_envSumGauss_j1eGauss, x, x_min, x_max
+                        , args = (n_nuc, atom_map, j1e_size, ezfio, EZFIO_file)
+        		, xtol        = 0.01
+        		, ftol        = 0.01 
+        	        , maxfev      = 100
+        		, full_output = 1
+                        , verbose     = 1 )
 
-    #opt   = my_fmin_powell( f, x, x_min, x_max
-    #    		     #, xtol        = 0.01
-    #    		     #, ftol        = 0.01 
-    #    	             , maxfev      = 100
-    #    		     , full_output = 1
-    #                         , verbose     = 1 )
+    print(" x = "+str(opt))
+    print(' number of function evaluations = {}'.format(globals.i_fev))
+    print(' memo_energy: {}'.formatglo(globals.memo_energy))
 
-    #print(" x = "+str(opt))
-    #print(' number of function evaluations = {}'.format(globals.i_fev))
-    #print(' memo_energy: {}'.formatglo(globals.memo_energy))
-
-    #print(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
+    print(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
 
 
 

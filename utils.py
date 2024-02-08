@@ -1,8 +1,9 @@
 
 import subprocess
+import random
 import globals
 from globals import block_time_f, total_time_f, Eloc_err_th, var_weight
-
+from jast_param import set_env_expo, set_j1e_expo, set_j1e_coef
 
 
 # ---
@@ -10,10 +11,34 @@ from globals import block_time_f, total_time_f, Eloc_err_th, var_weight
 def run_qmc(EZFIO_file):
     return subprocess.check_output(['qmcchem', 'run', EZFIO_file])
 
-# ---
-
 def stop_qmc(EZFIO_file):
     subprocess.check_output(['qmcchem', 'stop', EZFIO_file])
+
+def set_vmc_params(block_time, total_time, EZFIO_file):
+    subprocess.check_output([ 'qmcchem', 'edit', '-c'
+                            , '-j', globals.j2e_type
+                            , '-t', str(total_time)
+                            , '-l', str(block_time)
+                            , EZFIO_file] )
+
+def get_energy(EZFIO_file):
+    buffer = subprocess.check_output(
+            ['qmcchem', 'result', '-e', 'e_loc', EZFIO_file], encoding='UTF-8')
+    if buffer.strip() != "":
+        buffer = buffer.splitlines()[-1]
+        _, energy, error = [float(x) for x in buffer.split()]
+        return energy, error
+    else:
+        return None, None
+
+def get_variance(EZFIO_file):
+    buffer = subprocess.check_output(['qmcchem', 'result', '-e', 'e_loc_qmcvar', EZFIO_file], encoding='UTF-8')
+    if buffer.strip() != "":
+        buffer = buffer.splitlines()[-1]
+        _, variance, error = [float(x) for x in buffer.split()]
+        return variance, error
+    else:
+        return None, None
 
 # ---
 
@@ -34,11 +59,32 @@ def make_atom_map(ezfio):
 
 # ---
 
-def f(x):
+def clear_tcscf_orbitals(EZFIO_file):
+    mor = EZFIO_file + "/bi_ortho_mos/mo_r_coef.gz"
+    mol = EZFIO_file + "/bi_ortho_mos/mo_l_coef.gz"
+    subprocess.check_call(['rm', '{}'.format(mor)])
+    subprocess.check_call(['rm', '{}'.format(mol)])
+
+def run_tcscf(ezfio, EZFIO_file):
+    with open("tc_scf.out", "w") as f:
+        subprocess.check_call(['qp_run', 'tc_scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
+    e_tcscf = ezfio.get_tc_scf_bitc_energy()
+    c_tcscf = ezfio.get_tc_scf_converged_tcscf()
+    return e_tcscf, c_tcscf
+
+# ---
+
+def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, j1e_size, ezfio, EZFIO_file):
 
     print('\n eval {} of f on:'.format(globals.i_fev))
-    print(' nuc param Jast = {}'.format(x[:-1]))
-    print(' b   param Jast = {}'.format(x[-1]))
+
+    env_expo = x[:n_nuc]
+    j1e_expo = x[n_nuc:2*n_nuc]
+    j1e_coef = x[2*n_nuc:]
+
+    print(' env expo: {}'.format(x[:n_nuc]))
+    print(' j1e expo: {}'.format(x[n_nuc:]))
+    print(' j1e coef: {}'.format(x[n_nuc:]))
 
     h = str(x)
     if h in globals.memo_energy:
@@ -46,25 +92,35 @@ def f(x):
 
     globals.i_fev = globals.i_fev + 1
 
-    set_params_pen(x[:-1])
-    set_params_b(x[-1])
-    set_vmc_params(block_time_f, total_time_f)
+    # UPDATE PARAMETERS
+    set_env_expo(env_expo, atom_map, ezfio)
+    set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
+    set_j1e_coef(j1e_expo, j1e_size, atom_map, ezfio)
+
+    # OPTIMIZE ORBITALS
+    e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
+    clear_tcscf_orbitals(EZFIO_file)
+    if not c_tcscf:
+        return 100.0 + 10.0 * random.random()
+
+    # GET VMC energy & variance 
+    set_vmc_params(block_time_f, total_time_f, EZFIO_file)
 
     loc_err = 10.
     ii      = 1
     ii_max  = 5 
     energy  = None
     err     = None
-    while( Eloc_err_th < loc_err ):
+    while(Eloc_err_th < loc_err):
 
-        run_qmc()
-        energy, err = get_energy()
-        var_en, _   = get_variance()
+        run_qmc(EZFIO_file)
+        energy, err = get_energy(EZFIO_file)
+        var_en, _   = get_variance(EZFIO_file)
 
-        if( (energy is None) or (err is None) ):
+        if((energy is None) or (err is None)):
             continue
 
-        elif( globals.memo_energy['fmin'] < (energy-2.*err) ):
+        elif(globals.memo_energy['fmin'] < (energy-2.*err)):
             print(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
             sys.stdout.flush()
             break
@@ -83,17 +139,4 @@ def f(x):
     return energy + var_weight * var_en
 
 # ---
-
-def run_tcscf(ezfio, EZFIO_file):
-    #_ = subprocess.check_output(['qp_run', 'tc_scf', EZFIO_file, '>', 'tc_scf.out'])
-    with open("tc_scf.out", "w") as f:
-        subprocess.check_call(['qp_run', 'tc_scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
-    e_tcscf = ezfio.get_tc_scf_bitc_energy()
-    c_tcscf = ezfio.get_tc_scf_converged_tcscf()
-    return e_tcscf, c_tcscf
-
-# ---
-
-
-
 
