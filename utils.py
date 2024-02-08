@@ -84,6 +84,15 @@ def f(x):
 
 # ---
 
+def run_tcscf(ezfio, EZFIO_file):
+    #_ = subprocess.check_output(['qp_run', 'tc_scf', EZFIO_file, '>', 'tc_scf.out'])
+    with open("tc_scf.out", "w") as f:
+        subprocess.check_call(['qp_run', 'tc_scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
+    e_tcscf = ezfio.get_tc_scf_bitc_energy()
+    c_tcscf = ezfio.get_tc_scf_converged_tcscf()
+    return e_tcscf, c_tcscf
+
+# ---
 
 
 

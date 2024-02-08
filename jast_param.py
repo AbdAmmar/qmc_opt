@@ -26,6 +26,14 @@ def set_params_b(b):
 
 # ---
 
+def get_mu(ezfio):
+    return ezfio.get_hamiltonian_mu_erf()
+
+def set_mu(mu, ezfio):
+    ezfio.set_hamiltonian_mu_erf(mu)
+
+# ---
+
 def get_env_coef(atom_map, ezfio):
     d = ezfio.get_jastrow_env_coef()
     return np.array([d[a[0]] for a in atom_map])
