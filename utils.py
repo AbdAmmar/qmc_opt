@@ -1,6 +1,7 @@
 
 import numpy as np
 import subprocess
+import os
 import random
 import globals
 from globals import block_time_f, total_time_f, Eloc_err_th, var_weight
@@ -61,10 +62,12 @@ def make_atom_map(ezfio):
 # ---
 
 def clear_tcscf_orbitals(EZFIO_file):
-    mor = EZFIO_file + "/bi_ortho_mos/mo_r_coef.gz"
-    mol = EZFIO_file + "/bi_ortho_mos/mo_l_coef.gz"
-    subprocess.check_call(['rm', '{}'.format(mor)])
-    subprocess.check_call(['rm', '{}'.format(mol)])
+    mor = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_r_coef.gz")
+    mol = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_l_coef.gz")
+    if os.path.exists(mor):
+        subprocess.check_call(['rm', mor])
+    if os.path.exists(mol):
+        subprocess.check_call(['rm', mol])
 
 def run_tcscf(ezfio, EZFIO_file):
     with open("tc_scf.out", "w") as f:
