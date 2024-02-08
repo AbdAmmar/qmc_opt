@@ -53,40 +53,43 @@ def set_env_expo(x, atom_map, ezfio):
 def get_j1e_size(ezfio):
     return ezfio.get_jastrow_j1e_size()
 
-def set_j1e_size(n, ezfio):
-    ezfio.set_jastrow_j1e_size(n)
+def set_j1e_size(j1e_size, ezfio):
+    ezfio.set_jastrow_j1e_size(j1e_size)
 
-def get_j1e_coef(n, atom_map, ezfio):
+def get_j1e_coef(j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_coef()).T
     r = []
-    for a in atom_map
-        for i in range(n):
-            r.append(f[i,a[0]])
+    for a in atom_map:
+        for p in range(j1e_size):
+            r.append(f[p,a[0]])
     return r
 
-def set_j1e_coef(x, n, atom_map, ezfio):
+def set_j1e_coef(x, j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_coef()).T
     for i,a in enumerate(atom_map):
         for j in a:
-            for p in range(n):
-                f[p,j] = x[i+p]
-    ezfio.set_jastrow_env_coef(f)
+            for p in range(j1e_size):
+                f[p,j] = x[i*j1e_size+p]
+    ezfio.set_jastrow_j1e_coef(f.T)
 
-def get_j1e_expo(n, atom_map, ezfio):
+def get_j1e_expo(j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_expo()).T
+    print("f1 = {}".format(f))
     r = []
-    for a in atom_map
-        for i in range(n):
-            r.append(f[i,a[0]])
+    for a in atom_map:
+        for p in range(j1e_size):
+            r.append(f[p,a[0]])
     return r
 
-def set_j1e_expo(x, n, atom_map, ezfio):
+def set_j1e_expo(x, j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_expo()).T
+    print("f2 = {}".format(f))
     for i,a in enumerate(atom_map):
         for j in a:
-            for p in range(n):
-                f[p,j] = x[i+p]
-    ezfio.set_jastrow_env_expo(f)
+            for p in range(j1e_size):
+                f[p,j] = x[i*j1e_size+p]
+    print("f3 = {}".format(f))
+    ezfio.set_jastrow_j1e_expo(f.T)
 
 # ---
 
