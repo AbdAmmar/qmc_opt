@@ -74,7 +74,9 @@ def run_tcscf(ezfio, EZFIO_file):
 
 # ---
 
-def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, j1e_size, ezfio, EZFIO_file):
+def f_envSumGauss_j1eGauss(x, args):
+
+    n_nuc, atom_map, j1e_size, ezfio, EZFIO_file = args
 
     print('\n eval {} of f on:'.format(globals.i_fev))
 

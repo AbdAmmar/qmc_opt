@@ -33,8 +33,10 @@ qp set hamiltonian mu_erf $mu
 qp set jastrow j2e_type $j2e_type
 qp set jastrow env_type $env_type
 qp set jastrow j1e_type $j1e_type
-qp set jastrow env_expo "[${expo_H},${expo_H},${expo_O}]"
-qp set jastrow env_coef "[${coef_H},${coef_H},${coef_O}]"
+qp set jastrow env_expo "[${expo_O},${expo_H},${expo_H}]"
+qp set jastrow env_coef "[${coef_O},${coef_H},${coef_H}]"
+qp set jastrow j1e_expo "[[1.0], [1.0], [1.0]]"
+qp set jastrow j1e_coef "[[-0.1], [-0.1], [-0.1]]"
 qp set qmcchem ci_threshold 0.0
 qp run save_for_qmcchem
 #qp run save_bitcpsileft_for_qmcchem

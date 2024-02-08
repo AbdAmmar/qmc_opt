@@ -44,11 +44,14 @@ if __name__ == '__main__':
     n_par = 3 * j1e_size * n_nuc
     print(' nb of parameters = {}'.format(n_par))
 
-    x_min = [(0.1) for _ in range(2*j1e_size*n_nuc)] + [(-9.9) for _ in range(j1e_size*n_nuc)] 
-    x_max = [(9.9) for _ in range(2*j1e_size*n_nuc)] + [(-0.1) for _ in range(j1e_size*n_nuc)]
-    print(' x in bounded between:')
-    print(x_min)
-    print(x_max)
+    x     = [(1.0) for _ in range(j1e_size*n_nuc)] + [(1.0) for _ in range(j1e_size*n_nuc)] + [(-0.1) for _ in range(j1e_size*n_nuc)] 
+    x_min = [(0.1) for _ in range(j1e_size*n_nuc)] + [(0.1) for _ in range(j1e_size*n_nuc)] + [(-9.9) for _ in range(j1e_size*n_nuc)] 
+    x_max = [(9.9) for _ in range(j1e_size*n_nuc)] + [(9.9) for _ in range(j1e_size*n_nuc)] + [(-0.1) for _ in range(j1e_size*n_nuc)]
+
+    print(' starting point: {}'.format(x))
+    print(' parameters are bounded between:')
+    print(' x_min: {}'.format(x_min))
+    print(' x_max: {}'.format(x_max))
 
     sys.stdout.flush()
 

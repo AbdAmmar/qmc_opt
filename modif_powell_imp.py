@@ -476,10 +476,10 @@ def my_fmin_powell( fcn, x0, xmin, xmax, args=(), xtol=1e-4, ftol=1e-4,
     myxmin = asarray( xmin )
     myxmax = asarray( xmax )
     orig_fcn = fcn
-    def fcn(x_new):
+    def fcn(x_new, *args):
         if _outside_limits(x_new, myxmin, myxmax):        
             return FUNC_MAX
-        return orig_fcn(x_new)
+        return orig_fcn(x_new, args)
 
     result = fmin_powell( fcn, asarray(x0), args=args, xtol=xtol, ftol=ftol,
                           maxiter=maxiter, full_output=1, disp=verbose,
