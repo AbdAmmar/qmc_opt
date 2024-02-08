@@ -1,4 +1,5 @@
 
+import numpy as np
 import subprocess
 import random
 import globals
@@ -100,13 +101,16 @@ def f_envSumGauss_j1eGauss(x, args):
     set_j1e_coef(j1e_expo, j1e_size, atom_map, ezfio)
 
     # OPTIMIZE ORBITALS
-    e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
     clear_tcscf_orbitals(EZFIO_file)
+    e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
     if c_tcscf:
+        print(' tc-scf converged')
+        print(' tc-scf energy = {}'.format(e_tcscf))
         mohf = np.array(ezfio.get_mo_basis_mo_coef()).T
         mor  = np.array(ezfio.get_bi_ortho_mos_mo_r_coef()).T
         ezfio.set_mo_basis_mo_coef(mor.T)
     else:
+        print(' tc-scf did not converged')
         return 100.0 + 10.0 * random.random()
 
     # GET VMC energy & variance 
