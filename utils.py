@@ -100,7 +100,11 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, j1e_size, ezfio, EZFIO_file):
     # OPTIMIZE ORBITALS
     e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
     clear_tcscf_orbitals(EZFIO_file)
-    if not c_tcscf:
+    if c_tcscf:
+        mohf = np.array(ezfio.get_mo_basis_mo_coef()).T
+        mor  = np.array(ezfio.get_bi_ortho_mos_mo_r_coef()).T
+        ezfio.set_mo_basis_mo_coef(mor.T)
+    else:
         return 100.0 + 10.0 * random.random()
 
     # GET VMC energy & variance 
@@ -135,6 +139,7 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, j1e_size, ezfio, EZFIO_file):
 
     globals.memo_energy[h]      = energy + err
     globals.memo_energy['fmin'] = min(energy, globals.memo_energy['fmin'])
+    ezfio.set_mo_basis_mo_coef(mohf.T)
 
     return energy + var_weight * var_en
 

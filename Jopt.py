@@ -39,12 +39,13 @@ if __name__ == '__main__':
     print(' nb of unique nuclei = {}'.format(n_nuc))
 
     j1e_size = get_j1e_size(ezfio)
+    print("j1e_size = {}".format(j1e_size))
 
     n_par = 3 * j1e_size * n_nuc
     print(' nb of parameters = {}'.format(n_par))
 
-    x_min = [(0.1) for _ in range(2*j1e_size*n_nuc), (-9.9) for _ in range(j1e_size*n_nuc)] 
-    x_max = [(9.9) for _ in range(2*j1e_size*n_nuc), (-0.1) for _ in range(j1e_size*n_nuc)]
+    x_min = [(0.1) for _ in range(2*j1e_size*n_nuc)] + [(-9.9) for _ in range(j1e_size*n_nuc)] 
+    x_max = [(9.9) for _ in range(2*j1e_size*n_nuc)] + [(-0.1) for _ in range(j1e_size*n_nuc)]
     print(' x in bounded between:')
     print(x_min)
     print(x_max)
