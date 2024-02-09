@@ -91,6 +91,7 @@ def f_envSumGauss_j1eGauss(x, args):
     print(' env expo: {}'.format(x[:n_nuc]))
     print(' j1e expo: {}'.format(x[n_nuc:]))
     print(' j1e coef: {}'.format(x[n_nuc:]))
+    sys.stdout.flush()
 
     h = str(x)
     if h in globals.memo_energy:

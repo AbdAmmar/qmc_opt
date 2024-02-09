@@ -33,13 +33,13 @@ if __name__ == '__main__':
 
     # map nuclei to a list
     atom_map = make_atom_map(ezfio)
-    print("atom_map: {}".format(atom_map))
+    print(" atom_map: {}".format(atom_map))
 
     n_nuc = len(atom_map)  # nb of nuclei withou repitition
     print(' nb of unique nuclei = {}'.format(n_nuc))
 
     j1e_size = get_j1e_size(ezfio)
-    print("j1e_size = {}".format(j1e_size))
+    print(" j1e_size = {}".format(j1e_size))
 
     n_par = 3 * j1e_size * n_nuc
     print(' nb of parameters = {}'.format(n_par))
