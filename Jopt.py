@@ -30,6 +30,7 @@ if __name__ == '__main__':
     ezfio.set_jastrow_j1e_type(globals.j1e_type)
     set_mu(globals.mu, ezfio)
     ezfio.set_tc_keywords_thresh_tcscf(globals.thresh_tcscf)
+    ezfio.set_tc_keywords_n_it_tcscf_max(globals.n_it_tcscf_max)
 
     # map nuclei to a list
     atom_map = make_atom_map(ezfio)
