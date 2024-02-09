@@ -1,7 +1,7 @@
 
 import numpy as np
 import subprocess
-import os
+import os, sys
 import random
 import globals
 from globals import block_time_f, total_time_f, Eloc_err_th, var_weight

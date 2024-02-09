@@ -82,7 +82,6 @@ def set_j1e_coef(x, j1e_size, atom_map, ezfio):
 
 def get_j1e_expo(j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_expo()).T
-    print("f1 = {}".format(f))
     r = []
     for a in atom_map:
         for p in range(j1e_size):
@@ -91,12 +90,10 @@ def get_j1e_expo(j1e_size, atom_map, ezfio):
 
 def set_j1e_expo(x, j1e_size, atom_map, ezfio):
     f = np.array(ezfio.get_jastrow_j1e_expo()).T
-    print("f2 = {}".format(f))
     for i,a in enumerate(atom_map):
         for j in a:
             for p in range(j1e_size):
                 f[p,j] = x[i*j1e_size+p]
-    print("f3 = {}".format(f))
     ezfio.set_jastrow_j1e_expo(f.T)
 
 # ---
