@@ -100,7 +100,7 @@ def run_tcscf(ezfio, EZFIO_file):
 
 def f_envSumGauss_j1eGauss(x, args):
 
-    n_nuc, atom_map, H_ind, H_nb, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
+    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
 
     print('\n eval {} of f on:'.format(globals.i_fev))
     print('\n x = {}'.format(x))
@@ -144,7 +144,12 @@ def f_envSumGauss_j1eGauss(x, args):
         ezfio.set_mo_basis_mo_coef(mor.T)
     else:
         print(' tc-scf did not converged')
-        return 100.0 + 10.0 * random.random()
+        energy = 100.0 + 10.0 * random.random()
+        var_en = 100.0 + 10.0 * random.random()
+        err    =         10.0 * random.random()
+        globals.memo_energy[h]      = energy + err
+        globals.memo_energy['fmin'] = min(energy, globals.memo_energy['fmin'])
+        return energy + var_weight * var_en
 
     # GET VMC energy & variance 
     set_vmc_params(block_time_f, total_time_f, EZFIO_file)

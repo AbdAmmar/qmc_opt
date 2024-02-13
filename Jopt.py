@@ -59,7 +59,7 @@ if __name__ == '__main__':
     n_par = n_par_env + n_par_j1e
     print(' total nb of parameters = {}'.format(n_par))
 
-    x     = [(1.0) for _ in range(n_par_env)] + [(1.0) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)] 
+    x     = [(2.0) for _ in range(n_par_env)] + [(1.0) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)] 
     x_min = [(0.1) for _ in range(n_par_env)] + [(0.1) for _ in range(n_par_j1e_expo)] + [(-9.9) for _ in range(n_par_j1e_coef)] 
     x_max = [(4.9) for _ in range(n_par_env)] + [(9.9) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)]
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     sys.stdout.flush()
 
     args = ( n_nuc, atom_map
-           , H_ind, H_nb, n_par_env
+           , H_ind, n_par_env
            , n_par_j1e_expo, j1e_size
            , ezfio, EZFIO_file )
 
