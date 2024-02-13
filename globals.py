@@ -15,3 +15,6 @@ j1e_type = "None"
 thresh_tcscf = 1.e-6
 n_it_tcscf_max = 10
 mu = 0.87
+
+list_H = [2, 3]
+env_expo_H = 100000.0

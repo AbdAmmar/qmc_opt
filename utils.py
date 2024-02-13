@@ -59,6 +59,26 @@ def make_atom_map(ezfio):
         atom_map[l[0]] = l[1:]
     return atom_map
 
+def Hatom_map(ezfio):
+    labels = {}
+    rank   = 0
+    for i,k in enumerate(ezfio.nuclei_nucl_label):
+        if k in labels:                
+            labels[k].append(i)            
+        else:
+            labels[k] = [rank, i]
+            rank += 1
+    H_map = []
+    H_ind = -1
+    for atom in labels.keys():
+        if(atom == "H"):
+            l = labels[atom]
+            H_ind = l[0]
+            H_map = l[1:]
+            break
+    H_nb = len(H_map)
+    return H_ind, H_nb, H_map 
+
 # ---
 
 def clear_tcscf_orbitals(EZFIO_file):
@@ -80,17 +100,26 @@ def run_tcscf(ezfio, EZFIO_file):
 
 def f_envSumGauss_j1eGauss(x, args):
 
-    n_nuc, atom_map, j1e_size, ezfio, EZFIO_file = args
+    n_nuc, atom_map, H_ind, H_nb, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
 
     print('\n eval {} of f on:'.format(globals.i_fev))
+    print('\n x = {}'.format(x))
 
-    env_expo = x[:n_nuc]
-    j1e_expo = x[n_nuc:2*n_nuc]
-    j1e_coef = x[2*n_nuc:]
+    env_expo = []
+    jj = 0
+    for ii in range(n_nuc):
+        if(ii == H_ind):
+            env_expo.append(globals.env_expo_H)
+        else:
+            env_expo.append(x[jj])
+            jj += 1
 
-    print(' env expo: {}'.format(x[:n_nuc]))
-    print(' j1e expo: {}'.format(x[n_nuc:]))
-    print(' j1e coef: {}'.format(x[n_nuc:]))
+    j1e_expo = x[n_par_env:n_par_env+n_par_j1e_expo]
+    j1e_coef = x[n_par_env+n_par_j1e_expo:]
+
+    print(' env expo: {}'.format(env_expo))
+    print(' j1e expo: {}'.format(j1e_expo))
+    print(' j1e coef: {}'.format(j1e_expo))
     sys.stdout.flush()
 
     h = str(x)
@@ -102,7 +131,7 @@ def f_envSumGauss_j1eGauss(x, args):
     # UPDATE PARAMETERS
     set_env_expo(env_expo, atom_map, ezfio)
     set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
-    set_j1e_coef(j1e_expo, j1e_size, atom_map, ezfio)
+    set_j1e_coef(j1e_coef, j1e_size, atom_map, ezfio)
 
     # OPTIMIZE ORBITALS
     clear_tcscf_orbitals(EZFIO_file)
