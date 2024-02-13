@@ -98,6 +98,14 @@ def run_tcscf(ezfio, EZFIO_file):
 
 # ---
 
+def run_scf(ezfio, EZFIO_file):
+    with open("scf.out", "w") as f:
+        subprocess.check_call(['qp_run', 'scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
+    e_scf = ezfio.get_hartree_fock_energy()
+    return e_scf
+
+# ---
+
 def f_envSumGauss_j1eGauss(x, args):
 
     n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args

@@ -11,7 +11,7 @@ memo_energy = {'fmin': 100.}
 
 j2e_type = "Mu"
 env_type = "Sum_Gauss"
-j1e_type = "None"
+j1e_type = "Gauss"
 thresh_tcscf = 1.e-6
 n_it_tcscf_max = 10
 mu = 0.87
