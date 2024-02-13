@@ -119,7 +119,7 @@ def f_envSumGauss_j1eGauss(x, args):
 
     print(' env expo: {}'.format(env_expo))
     print(' j1e expo: {}'.format(j1e_expo))
-    print(' j1e coef: {}'.format(j1e_expo))
+    print(' j1e coef: {}'.format(j1e_coef))
     sys.stdout.flush()
 
     h = str(x)
