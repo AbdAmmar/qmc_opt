@@ -102,6 +102,10 @@ def f_envSumGauss_j1eGauss(x, args):
 
     n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
 
+    h = str(x)
+    if h in globals.memo_energy:
+        return globals.memo_energy[h]
+
     print('\n eval {} of f on:'.format(globals.i_fev))
     print('\n x = {}'.format(x))
 
@@ -121,10 +125,6 @@ def f_envSumGauss_j1eGauss(x, args):
     print(' j1e expo: {}'.format(j1e_expo))
     print(' j1e coef: {}'.format(j1e_coef))
     sys.stdout.flush()
-
-    h = str(x)
-    if h in globals.memo_energy:
-        return globals.memo_energy[h]
 
     globals.i_fev = globals.i_fev + 1
 
