@@ -19,4 +19,4 @@ mu = 0.87
 list_H = [2, 3]
 env_expo_H = 100000.0
 
-do_scf = False #True
+do_scf = True

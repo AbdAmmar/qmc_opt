@@ -54,15 +54,15 @@ if __name__ == '__main__':
     n_nuc = len(atom_map)  # nb of nuclei withou repitition
     #print(' nb of unique nuclei = {}'.format(n_nuc))
 
-#    n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max = init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio)
-#    args = ( n_nuc, atom_map
-#           , H_ind, n_par_env
-#           , n_par_j1e_expo, j1e_size
-#           , ezfio, EZFIO_file )
+    n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max = init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio)
+    args = ( n_nuc, atom_map
+           , H_ind, n_par_env
+           , n_par_j1e_expo, j1e_size
+           , ezfio, EZFIO_file )
 
-    n_par = 5
-    x, x_min, x_max = init_rosen(n_par)
-    args = ()
+    #n_par = 5
+    #x, x_min, x_max = init_rosen(n_par)
+    #args = ()
 
     print(' total nb of parameters = {}'.format(n_par))
     print(' starting point: {}'.format(x))
@@ -90,8 +90,8 @@ if __name__ == '__main__':
         "ub": np.array(x_max)
     }
     opt = fmin_powell( 
-                       #f_envSumGauss_j1eGauss
-                       f_rosen
+                       #f_rosen
+                       f_envSumGauss_j1eGauss
                      , x
                      , args        = args
                      , bounds      = bounds

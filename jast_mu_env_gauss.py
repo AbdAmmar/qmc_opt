@@ -8,9 +8,9 @@ from qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance
 from jast_param import set_env_expo, set_j1e_expo, set_j1e_coef, get_j1e_size
 
 
-def f_envSumGauss_j1eGauss(x, args):
-
-    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
+#def f_envSumGauss_j1eGauss(x, args):
+#    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
+def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file):
 
     h = str(x)
     if h in globals.memo_energy:
