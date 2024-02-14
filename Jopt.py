@@ -6,11 +6,12 @@ from ezfio import ezfio
 from datetime import datetime
 import time
 import numpy as np
-
-from modif_powell_imp import my_fmin_powell
-from utils import make_atom_map, Hatom_map, f_envSumGauss_j1eGauss, run_scf, clear_tcscf_orbitals
-from jast_param import get_env_coef, get_env_expo, get_j1e_size, get_j1e_coef, get_j1e_expo, get_mu
-from jast_param import set_env_coef, set_env_expo, set_j1e_size, set_j1e_coef, set_j1e_expo, set_mu
+from opt.scipy_powell import fmin_powell
+from opt.modif_powell_imp import my_fmin_powell
+from qp2_utils import make_atom_map, Hatom_map, run_scf
+from rosen import f_rosen, init_rosen
+from jast_mu_env_gauss import f_envSumGauss_j1eGauss, init_envSumGauss_j1eGauss
+from jast_param import set_mu
 import globals
 
 
@@ -21,11 +22,12 @@ if __name__ == '__main__':
     EZFIO_file = sys.argv[1] 
     ezfio.set_file(EZFIO_file)
 
-    print(" Today's date:", datetime.now() )
+    print(" Today's date:", datetime.now())
     print(" EZFIO file = {}".format(EZFIO_file))
 
-    E_scf = run_scf(ezfio, EZFIO_file)
-    print(" HF energy = {}".format(E_scf))
+    if(globals.do_scf):
+        E_scf = run_scf(ezfio, EZFIO_file)
+        print(" HF energy = {}".format(E_scf))
 
     # JASTROW PARAMETRS
     ezfio.set_jastrow_j2e_type(globals.j2e_type)
@@ -52,25 +54,17 @@ if __name__ == '__main__':
     n_nuc = len(atom_map)  # nb of nuclei withou repitition
     #print(' nb of unique nuclei = {}'.format(n_nuc))
 
-    n_par_env = n_nuc
-    if(H_nb != 0):
-        n_par_env = n_par_env - 1
-    #print(' nb of parameters for env = {}'.format(n_par_env))
+#    n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max = init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio)
+#    args = ( n_nuc, atom_map
+#           , H_ind, n_par_env
+#           , n_par_j1e_expo, j1e_size
+#           , ezfio, EZFIO_file )
 
-    j1e_size = get_j1e_size(ezfio)
-    #print(" j1e_size = {}".format(j1e_size))
-    n_par_j1e_expo = j1e_size * n_nuc
-    n_par_j1e_coef = j1e_size * n_nuc
-    n_par_j1e = n_par_j1e_expo + n_par_j1e_coef
-    #print(' nb of parameters for j1e = {}'.format(n_par_j1e))
+    n_par = 5
+    x, x_min, x_max = init_rosen(n_par)
+    args = ()
 
-    n_par = n_par_env + n_par_j1e
     print(' total nb of parameters = {}'.format(n_par))
-
-    x     = [(0.5) for _ in range(n_par_env)] + [(1.0) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)] 
-    x_min = [(0.1) for _ in range(n_par_env)] + [(0.1) for _ in range(n_par_j1e_expo)] + [(-9.9) for _ in range(n_par_j1e_coef)] 
-    x_max = [(4.9) for _ in range(n_par_env)] + [(9.9) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)]
-
     print(' starting point: {}'.format(x))
     print(' parameters are bounded between:')
     print(' x_min: {}'.format(x_min))
@@ -78,22 +72,39 @@ if __name__ == '__main__':
 
     sys.stdout.flush()
 
-    args = ( n_nuc, atom_map
-           , H_ind, n_par_env
-           , n_par_j1e_expo, j1e_size
-           , ezfio, EZFIO_file )
 
-    opt = my_fmin_powell( f_envSumGauss_j1eGauss, x, x_min, x_max
-                        , args        = args
-        		, xtol        = 0.1
-        		, ftol        = 0.1
-        	        , maxfev      = 100
-        		, full_output = 1
-                        , verbose     = 1 )
+#    opt = my_fmin_powell( 
+#                          #f_envSumGauss_j1eGauss
+#                          f_rosen
+#                        , x, x_min, x_max
+#                        , args        = args
+#                        , xtol        = 0.1
+#                        , ftol        = 0.1
+#                        , maxfev      = 100
+#                        , maxiter     = 5
+#                        , full_output = 1
+#                        , verbose     = 1 )
+
+    bounds = {
+        "lb": np.array(x_min),
+        "ub": np.array(x_max)
+    }
+    opt = fmin_powell( 
+                       #f_envSumGauss_j1eGauss
+                       f_rosen
+                     , x
+                     , args        = args
+                     , bounds      = bounds
+                     , xtol        = 0.1
+                     , ftol        = 0.1
+        	      , maxfev      = 100
+        	      , maxiter     = 5
+                     , full_output = 1 )
+
 
     print(" x = "+str(opt))
     print(' number of function evaluations = {}'.format(globals.i_fev))
-    print(' memo_energy: {}'.formatglo(globals.memo_energy))
+    print(' memo_energy: {}'.format(globals.memo_energy))
 
     print(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
 

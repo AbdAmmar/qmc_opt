@@ -481,6 +481,11 @@ def my_fmin_powell( fcn, x0, xmin, xmax, args=(), xtol=1e-4, ftol=1e-4,
             return FUNC_MAX
         return orig_fcn(x_new, args)
 
+    print(" xtol    = {}".format(xtol))
+    print(" ftol    = {}".format(ftol))
+    print(" maxfev  = {}".format(maxfev))
+    print(" maxiter = {}".format(maxiter))
+
     result = fmin_powell( fcn, asarray(x0), args=args, xtol=xtol, ftol=ftol,
                           maxiter=maxiter, full_output=1, disp=verbose,
                           retall=retall, callback=callback, direc=direc )

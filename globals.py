@@ -4,7 +4,7 @@ block_time_f = 60
 total_time_f = 200
 
 Eloc_err_th = 0.01
-var_weight = 0.02
+var_weight = 0.00
 
 i_fev = 1
 memo_energy = {'fmin': 100.}
@@ -18,3 +18,5 @@ mu = 0.87
 
 list_H = [2, 3]
 env_expo_H = 100000.0
+
+do_scf = False #True
