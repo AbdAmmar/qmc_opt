@@ -8,10 +8,11 @@ import time
 import numpy as np
 from opt.scipy_powell import fmin_powell
 from opt.modif_powell_imp import my_fmin_powell
-from qp2_utils import make_atom_map, Hatom_map, run_scf
+from utils.qp2_utils import make_atom_map, Hatom_map, run_scf
+from utils.utils import append_to_output
 from rosen import f_rosen, init_rosen
-from jast_mu_env_gauss import f_envSumGauss_j1eGauss, init_envSumGauss_j1eGauss
-from jast_param import set_mu
+from jast.jast_mu_env_gauss import f_envSumGauss_j1eGauss, init_envSumGauss_j1eGauss
+from jast.jast_param import set_mu
 import globals
 
 
@@ -22,12 +23,12 @@ if __name__ == '__main__':
     EZFIO_file = sys.argv[1] 
     ezfio.set_file(EZFIO_file)
 
-    print(" Today's date:", datetime.now())
-    print(" EZFIO file = {}".format(EZFIO_file))
+    append_to_output(" Today's date: {}".format(datetime.now()))
+    append_to_output(" EZFIO file = {}".format(EZFIO_file))
 
     if(globals.do_scf):
         E_scf = run_scf(ezfio, EZFIO_file)
-        print(" HF energy = {}".format(E_scf))
+        append_to_output(" HF energy = {}".format(E_scf))
 
     # JASTROW PARAMETRS
     ezfio.set_jastrow_j2e_type(globals.j2e_type)
@@ -37,10 +38,10 @@ if __name__ == '__main__':
     ezfio.set_tc_keywords_thresh_tcscf(globals.thresh_tcscf)
     ezfio.set_tc_keywords_n_it_tcscf_max(globals.n_it_tcscf_max)
 
-    print(" j2e_type = {}".format(globals.j2e_type))
-    print(" env_type = {}".format(globals.env_type))
-    print(" j1e_type = {}".format(globals.j1e_type))
-    print(" mu       = {}".format(globals.mu))
+    append_to_output(" j2e_type = {}".format(globals.j2e_type))
+    append_to_output(" env_type = {}".format(globals.env_type))
+    append_to_output(" j1e_type = {}".format(globals.j1e_type))
+    append_to_output(" mu       = {}".format(globals.mu))
 
     # map nuclei to a list
     atom_map = make_atom_map(ezfio)
@@ -60,15 +61,18 @@ if __name__ == '__main__':
            , n_par_j1e_expo, j1e_size
            , ezfio, EZFIO_file )
 
+
     #n_par = 5
     #x, x_min, x_max = init_rosen(n_par)
     #args = ()
 
-    print(' total nb of parameters = {}'.format(n_par))
-    print(' starting point: {}'.format(x))
-    print(' parameters are bounded between:')
-    print(' x_min: {}'.format(x_min))
-    print(' x_max: {}'.format(x_max))
+    x = [0.80031056, 0.14634672, 3.84326691, -0.1, -0.1] 
+
+    append_to_output(' total nb of parameters = {}'.format(n_par))
+    append_to_output(' starting point: {}'.format(x))
+    append_to_output(' parameters are bounded between:')
+    append_to_output(' x_min: {}'.format(x_min))
+    append_to_output(' x_max: {}'.format(x_max))
 
     sys.stdout.flush()
 
@@ -102,11 +106,11 @@ if __name__ == '__main__':
                      , full_output = 1 )
 
 
-    print(" x = "+str(opt))
-    print(' number of function evaluations = {}'.format(globals.i_fev))
-    print(' memo_energy: {}'.format(globals.memo_energy))
+    append_to_output(" x = "+str(opt))
+    append_to_output(' number of function evaluations = {}'.format(globals.i_fev))
+    append_to_output(' memo_energy: {}'.format(globals.memo_energy))
 
-    print(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
+    append_to_output(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
 
 
 

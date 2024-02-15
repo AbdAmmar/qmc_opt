@@ -20,3 +20,5 @@ list_H = [2, 3]
 env_expo_H = 100000.0
 
 do_scf = True
+
+file_out="RESULTS.out"
