@@ -10,7 +10,7 @@ from opt.scipy_powell import fmin_powell
 from opt.modif_powell_imp import my_fmin_powell
 from utils.qp2_utils import make_atom_map, Hatom_map, run_scf
 from utils.utils import append_to_output
-from rosen import f_rosen, init_rosen
+from utils.rosen import f_rosen, init_rosen
 from jast.jast_mu_env_gauss import f_envSumGauss_j1eGauss, init_envSumGauss_j1eGauss
 from jast.jast_param import set_mu
 import globals
@@ -20,14 +20,13 @@ if __name__ == '__main__':
 
     t0 = time.time()
 
-    EZFIO_file = sys.argv[1] 
-    ezfio.set_file(EZFIO_file)
+    ezfio.set_file(globals.EZFIO_file)
 
     append_to_output(" Today's date: {}".format(datetime.now()))
-    append_to_output(" EZFIO file = {}".format(EZFIO_file))
+    append_to_output(" EZFIO file = {}".format(globals.EZFIO_file))
 
     if(globals.do_scf):
-        E_scf = run_scf(ezfio, EZFIO_file)
+        E_scf = run_scf(ezfio, globals.EZFIO_file)
         append_to_output(" HF energy = {}".format(E_scf))
 
     # JASTROW PARAMETRS
@@ -59,7 +58,7 @@ if __name__ == '__main__':
     args = ( n_nuc, atom_map
            , H_ind, n_par_env
            , n_par_j1e_expo, j1e_size
-           , ezfio, EZFIO_file )
+           , ezfio )
 
 
     #n_par = 5
