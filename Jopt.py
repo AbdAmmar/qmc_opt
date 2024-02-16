@@ -26,7 +26,7 @@ if __name__ == '__main__':
     append_to_output(" EZFIO file = {}".format(globals.EZFIO_file))
 
     if(globals.do_scf):
-        E_scf = run_scf(ezfio, globals.EZFIO_file)
+        E_scf = run_scf(ezfio)
         append_to_output(" HF energy = {}".format(E_scf))
 
     # JASTROW PARAMETRS

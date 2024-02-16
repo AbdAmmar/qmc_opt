@@ -10,7 +10,7 @@ from jast.jast_param import set_env_expo, set_j1e_expo, set_j1e_coef, get_j1e_si
 
 
 #def f_envSumGauss_j1eGauss(x, args):
-#    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef, j1e_size, ezfio, EZFIO_file = args
+#    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef, j1e_size, ezfio = args
 def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef, j1e_size, ezfio):
 
     h = str(x)
@@ -45,8 +45,8 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
     set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
 
     # OPTIMIZE ORBITALS
-    clear_tcscf_orbitals(globals.EZFIO_file)
-    e_tcscf, c_tcscf = run_tcscf(ezfio, globals.EZFIO_file)
+    clear_tcscf_orbitals()
+    e_tcscf, c_tcscf = run_tcscf(ezfio)
     if c_tcscf:
         append_to_output(' tc-scf energy = {}'.format(e_tcscf))
         mohf = np.array(ezfio.get_mo_basis_mo_coef()).T
@@ -63,7 +63,7 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
         return energy + globals.var_weight * var_en
 
     # GET VMC energy & variance 
-    set_vmc_params(globals.block_time_f, globals.total_time_f, globals.EZFIO_file)
+    set_vmc_params()
 
     loc_err = 10.
     ii      = 1
@@ -72,9 +72,9 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
     err     = None
     while(globals.Eloc_err_th < loc_err):
 
-        run_qmc(globals.EZFIO_file)
-        energy, err = get_energy(globals.EZFIO_file)
-        var_en, _   = get_variance(globals.EZFIO_file)
+        run_qmc()
+        energy, err = get_energy()
+        var_en, _   = get_variance()
 
         if((energy is None) or (err is None)):
             continue

@@ -1,6 +1,7 @@
 
 import subprocess
 import os
+import globals
 
 
 # ---
@@ -42,10 +43,10 @@ def Hatom_map(ezfio):
 
 # ---
 
-def clear_tcscf_orbitals(ezfio, EZFIO_file):
-    mor = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_r_coef.gz")
-    mol = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_l_coef.gz")
-    etc = os.path.join(EZFIO_file, "tc_scf", "bitc_energy")
+def clear_tcscf_orbitals(ezfio):
+    mor = os.path.join(globals.EZFIO_file, "bi_ortho_mos", "mo_r_coef.gz")
+    mol = os.path.join(globals.EZFIO_file, "bi_ortho_mos", "mo_l_coef.gz")
+    etc = os.path.join(globals.EZFIO_file, "tc_scf", "bitc_energy")
     if os.path.exists(mor):
         subprocess.check_call(['rm', mor])
     if os.path.exists(mol):
@@ -54,11 +55,11 @@ def clear_tcscf_orbitals(ezfio, EZFIO_file):
         subprocess.check_call(['rm', etc])
     ezfio.set_tc_scf_converged_tcscf(False)
 
-def run_tcscf(ezfio, EZFIO_file):
+def run_tcscf(ezfio):
     with open("tc_scf.out", "w") as f:
-        subprocess.check_call(['qp_run', 'tc_scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
-    etc = os.path.join(EZFIO_file, "tc_scf", "bitc_energy")
-    ctc = os.path.join(EZFIO_file, "tc_scf", "converged_tcscf")
+        subprocess.check_call(['qp_run', 'tc_scf', globals.EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
+    etc = os.path.join(globals.EZFIO_file, "tc_scf", "bitc_energy")
+    ctc = os.path.join(globals.EZFIO_file, "tc_scf", "converged_tcscf")
     e_tcscf = None
     c_tcscf = False
     if os.path.exists(etc):
@@ -69,9 +70,9 @@ def run_tcscf(ezfio, EZFIO_file):
 
 # ---
 
-def run_scf(ezfio, EZFIO_file):
+def run_scf(ezfio):
     with open("scf.out", "w") as f:
-        subprocess.check_call(['qp_run', 'scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
+        subprocess.check_call(['qp_run', 'scf', globals.EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
     e_scf = ezfio.get_hartree_fock_energy()
     return e_scf
 
