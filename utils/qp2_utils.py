@@ -42,19 +42,29 @@ def Hatom_map(ezfio):
 
 # ---
 
-def clear_tcscf_orbitals(EZFIO_file):
+def clear_tcscf_orbitals(ezfio, EZFIO_file):
     mor = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_r_coef.gz")
     mol = os.path.join(EZFIO_file, "bi_ortho_mos", "mo_l_coef.gz")
+    etc = os.path.join(EZFIO_file, "tc_scf", "bitc_energy")
     if os.path.exists(mor):
         subprocess.check_call(['rm', mor])
     if os.path.exists(mol):
         subprocess.check_call(['rm', mol])
+    if os.path.exists(etc):
+        subprocess.check_call(['rm', etc])
+    ezfio.set_tc_scf_converged_tcscf(False)
 
 def run_tcscf(ezfio, EZFIO_file):
     with open("tc_scf.out", "w") as f:
         subprocess.check_call(['qp_run', 'tc_scf', EZFIO_file], stdout=f, stderr=subprocess.STDOUT)
-    e_tcscf = ezfio.get_tc_scf_bitc_energy()
-    c_tcscf = ezfio.get_tc_scf_converged_tcscf()
+    etc = os.path.join(EZFIO_file, "tc_scf", "bitc_energy")
+    ctc = os.path.join(EZFIO_file, "tc_scf", "converged_tcscf")
+    e_tcscf = None
+    c_tcscf = False
+    if os.path.exists(etc):
+        e_tcscf = ezfio.get_tc_scf_bitc_energy()
+    if os.path.exists(ctc):
+        c_tcscf = ezfio.get_tc_scf_converged_tcscf()
     return e_tcscf, c_tcscf
 
 # ---

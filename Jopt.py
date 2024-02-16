@@ -58,15 +58,13 @@ if __name__ == '__main__':
     n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max = init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio)
     args = ( n_nuc, atom_map
            , H_ind, n_par_env
-           , n_par_j1e_expo, j1e_size
+           , n_par_j1e_coef, j1e_size
            , ezfio, EZFIO_file )
 
 
     #n_par = 5
     #x, x_min, x_max = init_rosen(n_par)
     #args = ()
-
-    x = [0.80031056, 0.14634672, 3.84326691, -0.1, -0.1] 
 
     append_to_output(' total nb of parameters = {}'.format(n_par))
     append_to_output(' starting point: {}'.format(x))

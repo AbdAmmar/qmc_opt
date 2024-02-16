@@ -10,8 +10,8 @@ from jast.jast_param import set_env_expo, set_j1e_expo, set_j1e_coef, get_j1e_si
 
 
 #def f_envSumGauss_j1eGauss(x, args):
-#    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file = args
-def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo, j1e_size, ezfio, EZFIO_file):
+#    n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef, j1e_size, ezfio, EZFIO_file = args
+def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef, j1e_size, ezfio, EZFIO_file):
 
     h = str(x)
     if h in globals.memo_energy:
@@ -29,23 +29,23 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_expo,
             env_expo.append(x[jj])
             jj += 1
 
-    j1e_expo = x[n_par_env:n_par_env+n_par_j1e_expo]
-    j1e_coef = x[n_par_env+n_par_j1e_expo:]
+    j1e_coef = x[n_par_env:n_par_env+n_par_j1e_coef]
+    j1e_expo = x[n_par_env+n_par_j1e_coef:]
 
     append_to_output(' env expo: {}'.format(env_expo))
-    append_to_output(' j1e expo: {}'.format(j1e_expo))
     append_to_output(' j1e coef: {}'.format(j1e_coef))
+    append_to_output(' j1e expo: {}'.format(j1e_expo))
     sys.stdout.flush()
 
     globals.i_fev = globals.i_fev + 1
 
     # UPDATE PARAMETERS
     set_env_expo(env_expo, atom_map, ezfio)
-    set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
     set_j1e_coef(j1e_coef, j1e_size, atom_map, ezfio)
+    set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
 
     # OPTIMIZE ORBITALS
-    clear_tcscf_orbitals(EZFIO_file)
+    clear_tcscf_orbitals(ezfio, EZFIO_file)
     e_tcscf, c_tcscf = run_tcscf(ezfio, EZFIO_file)
     if c_tcscf:
         append_to_output(' tc-scf energy = {}'.format(e_tcscf))
@@ -110,17 +110,17 @@ def init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio):
     j1e_size = get_j1e_size(ezfio)
     #print(" j1e_size = {}".format(j1e_size))
 
-    n_par_j1e_expo = j1e_size * n_nuc
     n_par_j1e_coef = j1e_size * n_nuc
-    n_par_j1e = n_par_j1e_expo + n_par_j1e_coef
+    n_par_j1e_expo = j1e_size * n_nuc
+    n_par_j1e = n_par_j1e_coef + n_par_j1e_expo
     #print(' nb of parameters for j1e = {}'.format(n_par_j1e))
 
     n_par = n_par_env + n_par_j1e
     #print(' total nb of parameters = {}'.format(n_par))
 
-    x     = [(0.5) for _ in range(n_par_env)] + [(1.0) for _ in range(n_par_j1e_expo)] + [(-0.1) for _ in range(n_par_j1e_coef)]
-    x_min = [(0.1) for _ in range(n_par_env)] + [(0.1) for _ in range(n_par_j1e_expo)] + [(-9.9) for _ in range(n_par_j1e_coef)]
-    x_max = [(4.9) for _ in range(n_par_env)] + [(9.9) for _ in range(n_par_j1e_expo)] + [(+9.9) for _ in range(n_par_j1e_coef)]
+    x     = [(1.5) for _ in range(n_par_env)] + [(+0.0) for _ in range(n_par_j1e_coef)] + [(5.0) for _ in range(n_par_j1e_expo)]
+    x_min = [(0.1) for _ in range(n_par_env)] + [(-4.9) for _ in range(n_par_j1e_coef)] + [(0.1) for _ in range(n_par_j1e_expo)]
+    x_max = [(4.9) for _ in range(n_par_env)] + [(+4.9) for _ in range(n_par_j1e_coef)] + [(9.9) for _ in range(n_par_j1e_expo)]
 
     return n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max
 
