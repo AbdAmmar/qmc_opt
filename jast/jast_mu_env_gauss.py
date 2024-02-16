@@ -18,7 +18,7 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
         return globals.memo_energy[h]
 
     append_to_output('\n eval {} of f on:'.format(globals.i_fev))
-    append_to_output(' x = ' + '  '.join([f"{num:.7f}" for xx in x])
+    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x]))
 
     env_expo = []
     jj = 0
@@ -32,9 +32,9 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
     j1e_coef = x[n_par_env:n_par_env+n_par_j1e_coef]
     j1e_expo = x[n_par_env+n_par_j1e_coef:]
 
-    append_to_output(' env expo: ' + '  '.join([f"{num:.7f}" for xx in env_expo])
-    append_to_output(' j1e coef: ' + '  '.join([f"{num:.7f}" for xx in j1e_coef])
-    append_to_output(' j1e expo: ' + '  '.join([f"{num:.7f}" for xx in j1e_expo])
+    append_to_output(' env expo: ' + '  '.join([f"{xx:.7f}" for xx in env_expo]))
+    append_to_output(' j1e coef: ' + '  '.join([f"{xx:.7f}" for xx in j1e_coef]))
+    append_to_output(' j1e expo: ' + '  '.join([f"{xx:.7f}" for xx in j1e_expo]))
     sys.stdout.flush()
 
     globals.i_fev = globals.i_fev + 1
@@ -45,7 +45,7 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
     set_j1e_expo(j1e_expo, j1e_size, atom_map, ezfio)
 
     # OPTIMIZE ORBITALS
-    clear_tcscf_orbitals()
+    clear_tcscf_orbitals(ezfio)
     e_tcscf, c_tcscf = run_tcscf(ezfio)
     if c_tcscf:
         append_to_output(' tc-scf energy = {}'.format(e_tcscf))

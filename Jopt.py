@@ -65,12 +65,14 @@ if __name__ == '__main__':
     #x, x_min, x_max = init_rosen(n_par)
     #args = ()
 
+    x = [ 2.46225578, -0.14002387, -0.09224709, 5.0, 5.0]
+
     append_to_output(' total nb of parameters = {}'.format(n_par))
     append_to_output(' starting point: {}'.format(x))
-    append_to_output(' x    : ' + '  '.join([f"{num:.7f}" for xx in x])
+    append_to_output(' x    : ' + '  '.join([f"{xx:.7f}" for xx in x]))
     append_to_output(' parameters are bounded between:')
-    append_to_output(' x_min: ' + '  '.join([f"{num:.7f}" for xx in x_min])
-    append_to_output(' x_max: ' + '  '.join([f"{num:.7f}" for xx in x_max])
+    append_to_output(' x_min: ' + '  '.join([f"{xx:.7f}" for xx in x_min]))
+    append_to_output(' x_max: ' + '  '.join([f"{xx:.7f}" for xx in x_max]))
 
     sys.stdout.flush()
 
