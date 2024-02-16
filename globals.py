@@ -1,4 +1,5 @@
 
+import sys
 
 block_time_f = 60
 total_time_f = 200
@@ -21,4 +22,6 @@ env_expo_H = 100000.0
 
 do_scf = True
 
-file_out="RESULTS.out"
+EZFIO_file = sys.argv[1]
+
+file_out="RESULTS_{}.out".format(EZFIO_file)
