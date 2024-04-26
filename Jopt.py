@@ -65,7 +65,8 @@ if __name__ == '__main__':
     #x, x_min, x_max = init_rosen(n_par)
     #args = ()
 
-    x = [ 2.46225578, -0.14002387, -0.09224709, 5.0, 5.0]
+    #x = [ 2.46225578, -0.14002387, -0.09224709, 5.0, 5.0]
+    x = [ 3.7980769,  -0.2277626,  0.0038478,  5.0000000,  5.0000000]
 
     append_to_output(' total nb of parameters = {}'.format(n_par))
     append_to_output(' starting point: {}'.format(x))
@@ -99,10 +100,10 @@ if __name__ == '__main__':
                      , x
                      , args        = args
                      , bounds      = bounds
-                     , xtol        = 0.1
-                     , ftol        = 0.1
-        	      , maxfev      = 100
-        	      , maxiter     = 5
+                     , xtol        = 0.01
+                     , ftol        = 0.01
+                     , maxfev      = 1000
+                     , maxiter     = 1000
                      , full_output = 1 )
 
 

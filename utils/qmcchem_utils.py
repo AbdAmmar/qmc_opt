@@ -18,8 +18,8 @@ def stop_qmc():
 def set_vmc_params():
     subprocess.check_output([ 'qmcchem', 'edit', '-c'
                             , '-j', globals.j2e_type
-                            , '-t', str(globals.total_time)
-                            , '-l', str(globals.block_time)
+                            , '-t', str(globals.vmc_total_time)
+                            , '-l', str(globals.vmc_block_time)
                             , globals.EZFIO_file] )
 
 # ---
