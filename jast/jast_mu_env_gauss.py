@@ -7,6 +7,7 @@ from utils.qp2_utils import clear_tcscf_orbitals, run_tcscf
 from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance
 from utils.utils import append_to_output
 from jast.jast_param import set_env_expo, set_j1e_expo, set_j1e_coef, get_j1e_size
+from jast.jast_param import set_mu
 
 
 #def f_envSumGauss_j1eGauss(x, args):
@@ -102,6 +103,14 @@ def f_envSumGauss_j1eGauss(x, n_nuc, atom_map, H_ind, n_par_env, n_par_j1e_coef,
 
 def init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio):
 
+    H_ind, H_nb, H_map = Hatom_map(ezfio)
+    print(" H_map: {}".format(H_map))
+    print(" H_ind: {}".format(H_ind))
+    print(" H_nb : {}".format(H_nb))
+
+    set_mu(globals.mu, ezfio)
+    append_to_output(" mu = {}".format(globals.mu))
+
     n_par_env = n_nuc
     if(H_nb != 0):
         n_par_env = n_par_env - 1
@@ -122,7 +131,21 @@ def init_envSumGauss_j1eGauss(n_nuc, H_nb, ezfio):
     x_min = [(0.1) for _ in range(n_par_env)] + [(-4.9) for _ in range(n_par_j1e_coef)] + [(0.1) for _ in range(n_par_j1e_expo)]
     x_max = [(4.9) for _ in range(n_par_env)] + [(+4.9) for _ in range(n_par_j1e_coef)] + [(9.9) for _ in range(n_par_j1e_expo)]
 
-    return n_par_env, j1e_size, n_par_j1e_expo, n_par_j1e_coef, n_par_j1e, n_par, x, x_min, x_max
+    args = ( n_nuc, atom_map
+           , H_ind, n_par_env
+           , n_par_j1e_coef, j1e_size
+           , ezfio )
+
+    append_to_output(' total nb of parameters = {}'.format(n_par))
+    append_to_output(' starting point: {}'.format(x))
+    append_to_output(' x    : ' + '  '.join([f"{xx:.7f}" for xx in x]))
+    append_to_output(' parameters are bounded between:')
+    append_to_output(' x_min: ' + '  '.join([f"{xx:.7f}" for xx in x_min]))
+    append_to_output(' x_max: ' + '  '.join([f"{xx:.7f}" for xx in x_max]))
+
+    sys.stdout.flush()
+
+    return args, x, x_min, x_max
 
 # ---
 
