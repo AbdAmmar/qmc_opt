@@ -47,3 +47,17 @@ def get_variance():
 
 # ---
 
+def get_var_Htc():
+    buffer = subprocess.check_output(['qmcchem', 'result', globals.EZFIO_file], encoding='UTF-8')
+    if buffer.strip() != "":
+        lines = buffer.split('\n')
+        for line in lines:
+            if "Var_htc" in line:
+                parts = line.split()
+                break
+        return parts[2], parts[4]
+    else:
+        return None, None
+
+# ---
+

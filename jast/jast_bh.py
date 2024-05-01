@@ -4,17 +4,18 @@ import sys
 import random
 import globals
 from utils.qp2_utils import clear_tcscf_orbitals, run_tcscf
-from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance
+from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance, get_var_Htc
 from utils.utils import append_to_output
 from jast.jast_param import get_jbh_m, get_jbh_n, get_jbh_o, get_jbh_c, get_jbh_size, get_jbh_en, get_jbh_ee
 from jast.jast_param import set_jbh_m, set_jbh_n, set_jbh_o, set_jbh_c, set_jbh_size, set_jbh_en, set_jbh_ee
 
+# ---
 
 def f_jbh(x, atom_map, ezfio):
 
     h = str(x)
-    if h in globals.memo_energy:
-        return globals.memo_energy[h]
+    if h in globals.memo_res:
+        return globals.memo_res[h]
 
     append_to_output('\n eval {} of f on:'.format(globals.i_fev))
     append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x]))
@@ -39,11 +40,10 @@ def f_jbh(x, atom_map, ezfio):
             var_en = 100.0 + 10.0 * random.random()
             err    =         10.0 * random.random()
             append_to_output(" energy: %f  %f %f"%(energy, err, var_en))
-            globals.memo_energy[h]      = energy + err
-            globals.memo_energy['fmin'] = min(energy, globals.memo_energy['fmin'])
+            globals.memo_res[h]      = energy + err
+            globals.memo_res['fmin'] = min(energy, globals.memo_res['fmin'])
             return energy + globals.var_weight * var_en
 
-    # GET VMC energy & variance 
     set_vmc_params()
 
     loc_err = 10.
@@ -60,7 +60,7 @@ def f_jbh(x, atom_map, ezfio):
         if((energy is None) or (err is None)):
             continue
 
-        elif(globals.memo_energy['fmin'] < (energy-2.*err)):
+        elif(globals.memo_res['fmin'] < (energy-2.*err)):
             append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
             sys.stdout.flush()
             break
@@ -73,11 +73,67 @@ def f_jbh(x, atom_map, ezfio):
                 break
             ii += 1
 
-    globals.memo_energy[h]      = energy + err
-    globals.memo_energy['fmin'] = min(energy, globals.memo_energy['fmin'])
-    ezfio.set_mo_basis_mo_coef(mohf.T)
+    globals.memo_res[h]      = energy + err
+    globals.memo_res['fmin'] = min(energy, globals.memo_res['fmin'])
+
+    if(globals.optimize_orb):
+        ezfio.set_mo_basis_mo_coef(mohf.T)
 
     return energy + globals.var_weight * var_en
+
+# ---
+
+def vartc_jbh_vmc(x, atom_map, ezfio):
+
+    h = str(x)
+    if h in globals.memo_res:
+        return globals.memo_res[h]
+
+    append_to_output('\n eval {} of f on:'.format(globals.i_fev))
+    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x]))
+
+    globals.i_fev = globals.i_fev + 1
+
+    # UPDATE PARAMETERS
+    map_x_to_jbh_coef(atom_map, ezfio, x)
+    print_jbh(atom_map, ezfio)
+
+    set_vmc_params()
+
+    loc_err = 10.
+    ii      = 1
+    ii_max  = 5 
+    energy  = None
+    err     = None
+    while(globals.Eloc_err_th < loc_err):
+
+        run_qmc()
+        energy, err = get_energy()
+        var_en, _ = get_variance()
+        var_Htc, var_Htc_err = get_var_Htc()
+
+        if((energy is None) or (err is None)):
+            continue
+
+        elif(globals.memo_res['fmin'] < var_Htc):
+            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
+            append_to_output(" var_Htc: %f %f"%(var_Htc, var_Htc_err))
+            sys.stdout.flush()
+            break
+
+        else:
+            loc_err = err
+            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
+            append_to_output(" var_Htc: %f %f"%(var_Htc, var_Htc_err))
+            sys.stdout.flush()
+            if( ii_max < ii ):
+                break
+            ii += 1
+
+    globals.memo_res[h]      = var_Htc
+    globals.memo_res['fmin'] = min(var_Htc, globals.memo_res['fmin'])
+
+    return var_Htc
 
 # ---
 
