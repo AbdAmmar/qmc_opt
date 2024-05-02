@@ -221,7 +221,7 @@ def map_x_to_jbh_coef(x):
                 jbh_c[ii] = x[jj]
                 jj += 1
 
-    set_jbh_c(jbh_c)
+    set_jbh_c(jbh_c, jbh_size)
 
 # ---
 

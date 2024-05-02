@@ -16,7 +16,7 @@ Eloc_err_th = 0.01
 var_weight = 0.00
 
 i_fev = 1
-memo_res = {'fmin': 1e10.}
+memo_res = {'fmin': 1e10}
 
 list_j2e_type = ["None", "Mu", "Mu_Nu", "Mur", "Boys", "Boys_Handy", "Qmckl"]
 list_env_type = ["None", "Prod_Gauss", "Sum_Gauss", "Sum_Slat", "Sum_Quartic"]
