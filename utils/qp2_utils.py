@@ -6,43 +6,6 @@ import globals
 
 # ---
 
-def make_atom_map(ezfio):
-    labels = {}
-    rank   = 0
-    for i,k in enumerate(ezfio.nuclei_nucl_label):
-        if k in labels:                
-            labels[k].append(i)            
-        else:
-            labels[k] = [rank, i]
-            rank += 1
-    atom_map = [[] for i in range(rank)]
-    for atom in labels.keys():
-        l = labels[atom]
-        atom_map[l[0]] = l[1:]
-    return atom_map
-
-def Hatom_map(ezfio):
-    labels = {}
-    rank   = 0
-    for i,k in enumerate(ezfio.nuclei_nucl_label):
-        if k in labels:                
-            labels[k].append(i)            
-        else:
-            labels[k] = [rank, i]
-            rank += 1
-    H_map = []
-    H_ind = -1
-    for atom in labels.keys():
-        if(atom == "H"):
-            l = labels[atom]
-            H_ind = l[0]
-            H_map = l[1:]
-            break
-    H_nb = len(H_map)
-    return H_ind, H_nb, H_map 
-
-# ---
-
 def clear_tcscf_orbitals(ezfio):
     mor = os.path.join(globals.EZFIO_file, "bi_ortho_mos", "mo_r_coef.gz")
     mol = os.path.join(globals.EZFIO_file, "bi_ortho_mos", "mo_l_coef.gz")

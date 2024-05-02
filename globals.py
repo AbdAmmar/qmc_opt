@@ -1,5 +1,13 @@
 
 import sys
+from ezfio import ezfio
+
+# ---
+
+EZFIO_file = sys.argv[1]
+ezfio.set_file(EZFIO_file)
+
+# ---
 
 vmc_block_time = 60
 vmc_total_time = 200
@@ -23,14 +31,11 @@ n_it_tcscf_max = 10
 
 mu = 0.87
 
-# TODO
-list_H = [2, 3]
 env_expo_H = 100000.0
 
-do_scf = True
+do_scf = False
 optimize_orb = False
 
-EZFIO_file = sys.argv[1]
 
 file_out="RESULTS_{}.out".format(EZFIO_file)
 
