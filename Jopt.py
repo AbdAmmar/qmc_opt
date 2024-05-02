@@ -7,17 +7,19 @@ from datetime import datetime
 import time
 import numpy as np
 from opt.scipy_powell import fmin_powell
+
 from utils.qp2_utils import run_scf
-from utils.atoms import make_atom_map
 from utils.utils import append_to_output
-from utils.rosen import f_rosen
+
 from jast.jast_mu_env_gauss import f_envSumGauss_j1eGauss
-from jast.jast_bh import f_jbh
+from jast.jast_bh import f_jbh, init_jbh, vartc_jbh_vmc
 
 from globals import ezfio, EZFIO_file
 from globals import do_scf
 from globals import optimize_orb, thresh_tcscf, n_it_tcscf_max
 from globals import j2e_type, env_type, j1e_type
+
+# ---
 
 if __name__ == '__main__':
 
@@ -42,17 +44,16 @@ if __name__ == '__main__':
     append_to_output(" env_type = {}".format(env_type))
     append_to_output(" j1e_type = {}".format(j1e_type))
 
-    # map nuclei to a list
-    atom_map = make_atom_map()
-
-    quit()
+    x, x_min, x_max = init_jbh()
+    args = ()
 
     bounds = {
         "lb": np.array(x_min),
         "ub": np.array(x_max)
     }
+
+
     opt = fmin_powell( 
-                       #f_rosen
                        #f_envSumGauss_j1eGauss
                        vartc_jbh_vmc
                      , x
@@ -67,7 +68,7 @@ if __name__ == '__main__':
 
     append_to_output(" x = "+str(opt))
     append_to_output(' number of function evaluations = {}'.format(globals.i_fev))
-    append_to_output(' memo_energy: {}'.format(globals.memo_energy))
+    append_to_output(' memo_res: {}'.format(globals.memo_res))
 
     append_to_output(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
 

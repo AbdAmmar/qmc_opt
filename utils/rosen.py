@@ -10,11 +10,10 @@ import random
 # ---
 
 def f_rosen(x, *args):
-#def f_rosen(x, args):
 
     h = str(x)
-    if h in globals.memo_energy:
-        return globals.memo_energy[h]
+    if h in globals.memo_res:
+        return globals.memo_res[h]
 
     print('\n eval {} of f on:'.format(globals.i_fev))
     print('\n x = {}'.format(x))
@@ -29,8 +28,8 @@ def f_rosen(x, *args):
     #time.sleep(3) 
 
     globals.i_fev = globals.i_fev + 1
-    globals.memo_energy[h]      = energy + err
-    globals.memo_energy['fmin'] = min(energy, globals.memo_energy['fmin'])
+    globals.memo_res[h]      = energy + err
+    globals.memo_res['fmin'] = min(energy, globals.memo_res['fmin'])
 
     return energy + globals.var_weight * var_en
 

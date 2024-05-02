@@ -2,16 +2,23 @@
 import numpy as np
 import sys
 import random
-import globals
+
 from utils.qp2_utils import clear_tcscf_orbitals, run_tcscf
 from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance, get_var_Htc
 from utils.utils import append_to_output
-from jast.jast_param import get_jbh_m, get_jbh_n, get_jbh_o, get_jbh_c, get_jbh_size, get_jbh_en, get_jbh_ee
-from jast.jast_param import set_jbh_m, set_jbh_n, set_jbh_o, set_jbh_c, set_jbh_size, set_jbh_en, set_jbh_ee
+
+from jast.jast_bh_param import get_jbh_m, get_jbh_n, get_jbh_o, get_jbh_c, get_jbh_size, get_jbh_en, get_jbh_ee
+from jast.jast_bh_param import set_jbh_m, set_jbh_n, set_jbh_o, set_jbh_c, set_jbh_size, set_jbh_en, set_jbh_ee
+
+import globals
+from globals import ezfio
+
+from utils.atoms import atom_map
+
 
 # ---
 
-def f_jbh(x, atom_map, ezfio):
+def f_jbh(x):
 
     h = str(x)
     if h in globals.memo_res:
@@ -23,12 +30,12 @@ def f_jbh(x, atom_map, ezfio):
     globals.i_fev = globals.i_fev + 1
 
     # UPDATE PARAMETERS
-    map_x_to_jbh_coef(atom_map, ezfio, x)
-    print_jbh(atom_map, ezfio)
+    map_x_to_jbh_coef(x)
+    print_jbh()
 
     if(globals.optimize_orb):
-        clear_tcscf_orbitals(ezfio)
-        e_tcscf, c_tcscf = run_tcscf(ezfio)
+        clear_tcscf_orbitals()
+        e_tcscf, c_tcscf = run_tcscf()
         if c_tcscf:
             append_to_output(' tc-scf energy = {}'.format(e_tcscf))
             mohf = np.array(ezfio.get_mo_basis_mo_coef()).T
@@ -83,7 +90,7 @@ def f_jbh(x, atom_map, ezfio):
 
 # ---
 
-def vartc_jbh_vmc(x, atom_map, ezfio):
+def vartc_jbh_vmc(x):
 
     h = str(x)
     if h in globals.memo_res:
@@ -95,8 +102,8 @@ def vartc_jbh_vmc(x, atom_map, ezfio):
     globals.i_fev = globals.i_fev + 1
 
     # UPDATE PARAMETERS
-    map_x_to_jbh_coef(atom_map, ezfio, x)
-    print_jbh(atom_map, ezfio)
+    map_x_to_jbh_coef(x)
+    print_jbh()
 
     set_vmc_params()
 
@@ -137,47 +144,41 @@ def vartc_jbh_vmc(x, atom_map, ezfio):
 
 # ---
 
-def init_jbh(atom_map, ezfio):
+def init_jbh():
 
-    jbh_size = get_jbh_size(ezfio)
+    jbh_size = get_jbh_size()
 
-    jbh_m = get_jbh_m(jbh_size, atom_map, ezfio)
-    jbh_n = get_jbh_n(jbh_size, atom_map, ezfio)
-    jbh_o = get_jbh_o(jbh_size, atom_map, ezfio)
+    jbh_m = get_jbh_m(jbh_size)
+    jbh_n = get_jbh_n(jbh_size)
+    jbh_o = get_jbh_o(jbh_size)
 
     exist = ezfio.has_jastrow_jbh_c()
     if(not exist):
         c_random = [random.uniform(-1, 1) for _ in range(len(atom_map)*jbh_size)]
-        set_jbh_c(c_random, jbh_size, atom_map, ezfio)
+        set_jbh_c(c_random, jbh_size)
     else:
         jbh_c = ezfio.get_jastrow_jbh_c()
-    jbh_c = get_jbh_c(jbh_size, atom_map, ezfio)
+    jbh_c = get_jbh_c(jbh_size)
 
-    print_jbh(atom_map, ezfio)
+    print_jbh()
 
-    x = map_jbh_coef_to_x(atom_map, ezfio)
+    x = map_jbh_coef_to_x()
 
     xx_min, xx_max = -10.0, +10.0
     x_min = [xx_min for _ in x]
     x_max = [xx_max for _ in x]
 
-    print(x)
-    print(x_min)
-    print(x_max)
-
-    args = (jbh_size, jbh_m, jbh_n, jbh_o)
-
-    return args, x, x_min, x_max
+    return x, x_min, x_max
 
 # ---
 
-def map_jbh_coef_to_x(atom_map, ezfio):
+def map_jbh_coef_to_x():
 
-    jbh_size = get_jbh_size(ezfio)
+    jbh_size = get_jbh_size()
 
-    jbh_m = get_jbh_m(jbh_size, atom_map, ezfio)
-    jbh_n = get_jbh_n(jbh_size, atom_map, ezfio)
-    jbh_c = get_jbh_c(jbh_size, atom_map, ezfio)
+    jbh_m = get_jbh_m(jbh_size)
+    jbh_n = get_jbh_n(jbh_size)
+    jbh_c = get_jbh_c(jbh_size)
 
     x = []
     for i,a in enumerate(atom_map):
@@ -195,12 +196,12 @@ def map_jbh_coef_to_x(atom_map, ezfio):
 
 # ---
 
-def map_x_to_jbh_coef(atom_map, ezfio, x):
+def map_x_to_jbh_coef(x):
 
-    jbh_size = get_jbh_size(ezfio)
+    jbh_size = get_jbh_size()
 
-    jbh_m = get_jbh_m(jbh_size, atom_map, ezfio)
-    jbh_n = get_jbh_n(jbh_size, atom_map, ezfio)
+    jbh_m = get_jbh_m(jbh_size)
+    jbh_n = get_jbh_n(jbh_size)
 
     jbh_c = [0.0 for _ in jbh_m]
 
@@ -224,15 +225,15 @@ def map_x_to_jbh_coef(atom_map, ezfio, x):
 
 # ---
 
-def print_jbh(atom_map, ezfio):
+def print_jbh():
 
-    jbh_size = get_jbh_size(ezfio)
+    jbh_size = get_jbh_size()
     append_to_output(" jbh_size = {}".format(jbh_size))
 
-    jbh_m = get_jbh_m(jbh_size, atom_map, ezfio)
-    jbh_n = get_jbh_n(jbh_size, atom_map, ezfio)
-    jbh_o = get_jbh_o(jbh_size, atom_map, ezfio)
-    jbh_c = get_jbh_c(jbh_size, atom_map, ezfio)
+    jbh_m = get_jbh_m(jbh_size)
+    jbh_n = get_jbh_n(jbh_size)
+    jbh_o = get_jbh_o(jbh_size)
+    jbh_c = get_jbh_c(jbh_size)
 
     for ii in range(len(atom_map)):
         append_to_output(" ATOM: {}   m       n       o       c".format(ii+1))

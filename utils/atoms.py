@@ -18,6 +18,7 @@ def make_atom_map():
         atom_map[l[0]] = l[1:]
     return atom_map
 
+atom_map = make_atom_map()
 
 # ---
 
