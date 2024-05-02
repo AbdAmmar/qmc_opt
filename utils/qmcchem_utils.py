@@ -55,7 +55,7 @@ def get_var_Htc():
             if "Var_htc" in line:
                 parts = line.split()
                 break
-        return parts[2], parts[4]
+        return float(parts[2]), float(parts[4])
     else:
         return None, None
 

@@ -20,6 +20,11 @@ def make_atom_map():
 
 atom_map = make_atom_map()
 
+atom_list = []
+all_atoms = ezfio.get_nuclei_nucl_label()
+for atoms in atom_map:
+    atom_list.append(all_atoms[atoms[0]])
+
 # ---
 
 def Hatom_map():

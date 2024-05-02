@@ -13,7 +13,7 @@ from jast.jast_bh_param import set_jbh_m, set_jbh_n, set_jbh_o, set_jbh_c, set_j
 import globals
 from globals import ezfio
 
-from utils.atoms import atom_map
+from utils.atoms import atom_map, atom_list
 
 
 # ---
@@ -24,8 +24,8 @@ def f_jbh(x):
     if h in globals.memo_res:
         return globals.memo_res[h]
 
-    append_to_output('\n eval {} of f on:'.format(globals.i_fev))
-    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x]))
+    append_to_output('\n eval {} of f on:\n'.format(globals.i_fev))
+    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x])+"\n")
 
     globals.i_fev = globals.i_fev + 1
 
@@ -37,16 +37,16 @@ def f_jbh(x):
         clear_tcscf_orbitals()
         e_tcscf, c_tcscf = run_tcscf()
         if c_tcscf:
-            append_to_output(' tc-scf energy = {}'.format(e_tcscf))
+            append_to_output(' tc-scf energy = {}\n'.format(e_tcscf))
             mohf = np.array(ezfio.get_mo_basis_mo_coef()).T
             mor  = np.array(ezfio.get_bi_ortho_mos_mo_r_coef()).T
             ezfio.set_mo_basis_mo_coef(mor.T)
         else:
-            append_to_output(' tc-scf did not converged')
+            append_to_output(' tc-scf did not converged\n')
             energy = 100.0 + 10.0 * random.random()
             var_en = 100.0 + 10.0 * random.random()
             err    =         10.0 * random.random()
-            append_to_output(" energy: %f  %f %f"%(energy, err, var_en))
+            append_to_output(" energy: %f  %f %f\n"%(energy, err, var_en))
             globals.memo_res[h]      = energy + err
             globals.memo_res['fmin'] = min(energy, globals.memo_res['fmin'])
             return energy + globals.var_weight * var_en
@@ -68,13 +68,13 @@ def f_jbh(x):
             continue
 
         elif(globals.memo_res['fmin'] < (energy-2.*err)):
-            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
+            append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
             sys.stdout.flush()
             break
 
         else:
             loc_err = err
-            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
+            append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
             sys.stdout.flush()
             if( ii_max < ii ):
                 break
@@ -96,8 +96,8 @@ def vartc_jbh_vmc(x):
     if h in globals.memo_res:
         return globals.memo_res[h]
 
-    append_to_output('\n eval {} of f on:'.format(globals.i_fev))
-    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x]))
+    append_to_output('\n eval {} of f on:\n'.format(globals.i_fev))
+    append_to_output(' x = ' + '  '.join([f"{xx:.7f}" for xx in x])+"\n")
 
     globals.i_fev = globals.i_fev + 1
 
@@ -123,15 +123,15 @@ def vartc_jbh_vmc(x):
             continue
 
         elif(globals.memo_res['fmin'] < var_Htc):
-            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
-            append_to_output(" var_Htc: %f %f"%(var_Htc, var_Htc_err))
+            append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
+            append_to_output(" var_Htc: %f %f\n"%(var_Htc, var_Htc_err))
             sys.stdout.flush()
             break
 
         else:
             loc_err = err
-            append_to_output(" %d energy: %f  %f %f"%(ii, energy, err, var_en))
-            append_to_output(" var_Htc: %f %f"%(var_Htc, var_Htc_err))
+            append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
+            append_to_output(" var_Htc: %f %f\n"%(var_Htc, var_Htc_err))
             sys.stdout.flush()
             if( ii_max < ii ):
                 break
@@ -228,23 +228,29 @@ def map_x_to_jbh_coef(x):
 def print_jbh():
 
     jbh_size = get_jbh_size()
-    append_to_output(" jbh_size = {}".format(jbh_size))
+    append_to_output(" jbh_size = {}\n".format(jbh_size))
 
     jbh_m = get_jbh_m(jbh_size)
     jbh_n = get_jbh_n(jbh_size)
     jbh_o = get_jbh_o(jbh_size)
     jbh_c = get_jbh_c(jbh_size)
 
-    for ii in range(len(atom_map)):
-        append_to_output(" ATOM: {}   m       n       o       c".format(ii+1))
-        for jj in range(jbh_size):
+    append_to_output("    m       n       o      ")
+    for atom in atom_list:
+        append_to_output(" c_{}         ".format(atom))
+    append_to_output("\n")
+
+    ii = 0
+    for jj in range(jbh_size):
+        m = jbh_m[jj]
+        n = jbh_n[jj]
+        o = jbh_o[jj]
+        append_to_output(" {:4d}    {:4d}    {:4d}   ".format(m, n, o))
+        for ii in range(len(atom_list)):
             i = ii*jbh_size+jj
-            m = jbh_m[i]
-            n = jbh_n[i]
-            o = jbh_o[i]
             c = jbh_c[i]
-            append_to_output("        {:4d}    {:4d}    {:4d}    {:+3.5f}".format(m, n, o, c))
-        append_to_output("")
+            append_to_output(" {:+3.5f}    ".format(c))
+        append_to_output("\n")
 
     sys.stdout.flush()
 

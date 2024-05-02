@@ -21,16 +21,19 @@ from globals import j2e_type, env_type, j1e_type
 
 # ---
 
+#from utils.qmcchem_utils import get_var_Htc
+
+
 if __name__ == '__main__':
 
     t0 = time.time()
 
-    append_to_output(" Today's date: {}".format(datetime.now()))
-    append_to_output(" EZFIO file = {}".format(EZFIO_file))
+    append_to_output(" Today's date: {}\n".format(datetime.now()))
+    append_to_output(" EZFIO file = {}\n".format(EZFIO_file))
 
     if(do_scf):
         E_scf = run_scf(ezfio)
-        append_to_output(" HF energy = {}".format(E_scf))
+        append_to_output(" HF energy = {}\n".format(E_scf))
     if(optimize_orb):
         ezfio.set_tc_keywords_thresh_tcscf(thresh_tcscf)
         ezfio.set_tc_keywords_n_it_tcscf_max(n_it_tcscf_max)
@@ -40,12 +43,16 @@ if __name__ == '__main__':
     ezfio.set_jastrow_env_type(env_type)
     ezfio.set_jastrow_j1e_type(j1e_type)
 
-    append_to_output(" j2e_type = {}".format(j2e_type))
-    append_to_output(" env_type = {}".format(env_type))
-    append_to_output(" j1e_type = {}".format(j1e_type))
+    append_to_output(" j2e_type = {}\n".format(j2e_type))
+    append_to_output(" env_type = {}\n".format(env_type))
+    append_to_output(" j1e_type = {}\n".format(j1e_type))
 
     x, x_min, x_max = init_jbh()
     args = ()
+
+    #var_Htc, var_Htc_err = get_var_Htc()
+    #print(var_Htc, var_Htc_err)
+    #quit()
 
     bounds = {
         "lb": np.array(x_min),
@@ -66,11 +73,11 @@ if __name__ == '__main__':
                      , full_output = 1 )
 
 
-    append_to_output(" x = "+str(opt))
-    append_to_output(' number of function evaluations = {}'.format(globals.i_fev))
-    append_to_output(' memo_res: {}'.format(globals.memo_res))
+    append_to_output(" x = "+str(opt)+"\n")
+    append_to_output(' number of function evaluations = {}\n'.format(globals.i_fev))
+    append_to_output(' memo_res: {}\n'.format(globals.memo_res))
 
-    append_to_output(" end after {:.3f} minutes".format((time.time()-t0)/60.) )
+    append_to_output(" end after {:.3f} minutes\n".format((time.time()-t0)/60.) )
 
 
 
