@@ -1,32 +1,33 @@
 
 import subprocess
-import globals
+
+from globals import EZFIO_file
+from globals import vmc_total_time, vmc_block_time
 
 
 # ---
 
 def run_qmc():
-    return subprocess.check_output(['qmcchem', 'run', globals.EZFIO_file])
+    return subprocess.check_output(['qmcchem', 'run', EZFIO_file])
 
 # ---
 
 def stop_qmc():
-    subprocess.check_output(['qmcchem', 'stop', globals.EZFIO_file])
+    subprocess.check_output(['qmcchem', 'stop', EZFIO_file])
 
 # ---
 
 def set_vmc_params():
     subprocess.check_output([ 'qmcchem', 'edit', '-c'
-                            , '-j', globals.j2e_type
-                            , '-t', str(globals.vmc_total_time)
-                            , '-l', str(globals.vmc_block_time)
-                            , globals.EZFIO_file] )
+                            , '-t', str(vmc_total_time)
+                            , '-l', str(vmc_block_time)
+                            , EZFIO_file] )
 
 # ---
 
 def get_energy():
     buffer = subprocess.check_output(
-            ['qmcchem', 'result', '-e', 'e_loc', globals.EZFIO_file], encoding='UTF-8')
+            ['qmcchem', 'result', '-e', 'e_loc', EZFIO_file], encoding='UTF-8')
     if buffer.strip() != "":
         buffer = buffer.splitlines()[-1]
         _, energy, error = [float(x) for x in buffer.split()]
@@ -37,7 +38,7 @@ def get_energy():
 # ---
 
 def get_variance():
-    buffer = subprocess.check_output(['qmcchem', 'result', '-e', 'e_loc_qmcvar', globals.EZFIO_file], encoding='UTF-8')
+    buffer = subprocess.check_output(['qmcchem', 'result', '-e', 'e_loc_qmcvar', EZFIO_file], encoding='UTF-8')
     if buffer.strip() != "":
         buffer = buffer.splitlines()[-1]
         _, variance, error = [float(x) for x in buffer.split()]
@@ -47,12 +48,12 @@ def get_variance():
 
 # ---
 
-def get_var_Htc():
-    buffer = subprocess.check_output(['qmcchem', 'result', globals.EZFIO_file], encoding='UTF-8')
+def get_QMC_scalar(scalar_name):
+    buffer = subprocess.check_output(['qmcchem', 'result', EZFIO_file], encoding='UTF-8')
     if buffer.strip() != "":
         lines = buffer.split('\n')
         for line in lines:
-            if "Var_htc" in line:
+            if scalar_name in line:
                 parts = line.split()
                 break
         return float(parts[2]), float(parts[4])

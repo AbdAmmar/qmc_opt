@@ -9,8 +9,8 @@ ezfio.set_file(EZFIO_file)
 
 # ---
 
-vmc_block_time = 30
-vmc_total_time = 150
+vmc_block_time = 25
+vmc_total_time = 100
 
 Eloc_err_th = 0.01
 var_weight = 0.00

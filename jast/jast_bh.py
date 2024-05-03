@@ -6,7 +6,9 @@ import random
 from utils.qp2_utils import clear_tcscf_orbitals, run_tcscf
 from utils.qp2_utils import run_gs_tc_energy
 
-from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance, get_var_Htc
+from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance
+from utils.qmcchem_utils import get_QMC_scalar
+
 from utils.utils import append_to_output
 
 from jast.jast_bh_param import get_jbh_m, get_jbh_n, get_jbh_o, get_jbh_c, get_jbh_size, get_jbh_en, get_jbh_ee
@@ -131,7 +133,9 @@ def vartc_jbh_vmc(x):
         run_qmc()
         energy, err = get_energy()
         var_en, _ = get_variance()
-        var_Htc, var_Htc_err = get_var_Htc()
+        var_Htc, var_Htc_err = get_QMC_scalar("Var_htc")
+        # to compare with e_tc_ref
+        Eloc_jpsi, var_Eloc_jpsi, = get_QMC_scalar("Eloc_jpsi")
 
         if((energy is None) or (err is None)):
             continue
@@ -139,6 +143,7 @@ def vartc_jbh_vmc(x):
         elif(globals.memo_res['fmin'] < var_Htc):
             append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
             append_to_output(" var_Htc: %f %f\n"%(var_Htc, var_Htc_err))
+            append_to_output(" Eloc_jpsi: %f %f\n"%(Eloc_jpsi, var_Eloc_jpsi))
             sys.stdout.flush()
             break
 
@@ -146,10 +151,15 @@ def vartc_jbh_vmc(x):
             loc_err = err
             append_to_output(" %d energy: %f  %f %f\n"%(ii, energy, err, var_en))
             append_to_output(" var_Htc: %f %f\n"%(var_Htc, var_Htc_err))
+            append_to_output(" Eloc_jpsi: %f %f\n"%(Eloc_jpsi, var_Eloc_jpsi))
             sys.stdout.flush()
-            if( ii_max < ii ):
+            if(ii_max < ii):
                 break
             ii += 1
+
+    diff = abs(Eloc_jpsi - e_tc_ref)
+    if(diff > 5.*err):
+        append_to_output(" WARNING !!! diff between QMC and QP = {}\n".format(diff))
 
     globals.memo_res[h]      = var_Htc
     globals.memo_res['fmin'] = min(var_Htc, globals.memo_res['fmin'])
@@ -170,6 +180,7 @@ def init_jbh():
     if(not exist):
         append_to_output(" jbh_c does not exist. A random initialisation is used.\n")
         c_random = [random.uniform(-1, 1) for _ in range(N_unique_atom*jbh_size)]
+        c_random = [0.1*xx for xx in c_random]
         for i,a in enumerate(atom_map):
             j = a[0]
             for p in range(jbh_size):
