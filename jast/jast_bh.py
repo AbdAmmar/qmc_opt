@@ -4,6 +4,8 @@ import sys
 import random
 
 from utils.qp2_utils import clear_tcscf_orbitals, run_tcscf
+from utils.qp2_utils import run_gs_tc_energy
+
 from utils.qmcchem_utils import set_vmc_params, run_qmc, get_energy, get_variance, get_var_Htc
 from utils.utils import append_to_output
 
@@ -106,6 +108,18 @@ def vartc_jbh_vmc(x):
     print_jbh()
 
     set_vmc_params()
+
+    # ---
+    # UPDATE TC REF ENERGY
+
+    e_tc_ref = run_gs_tc_energy("Boys_Handy", "None", "None", "Write", "numeric")
+    append_to_output(' TC Energy of ref WF= {}\n'.format(e_tc_ref))
+
+    ezfio.set_jastrow_j2e_type("None")
+    ezfio.set_jastrow_env_type("None")
+    ezfio.set_jastrow_j1e_type("None")
+
+    # ---
 
     loc_err = 10.
     ii      = 1

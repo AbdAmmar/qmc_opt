@@ -21,7 +21,6 @@ from globals import j2e_type, env_type, j1e_type
 
 # ---
 
-#from utils.qmcchem_utils import get_var_Htc
 
 
 if __name__ == '__main__':
@@ -49,11 +48,6 @@ if __name__ == '__main__':
 
     x, x_min, x_max = init_jbh()
     args = ()
-
-
-    #var_Htc, var_Htc_err = get_var_Htc()
-    #print(var_Htc, var_Htc_err)
-    #quit()
 
     bounds = {
         "lb": np.array(x_min),
