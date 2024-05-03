@@ -3,7 +3,7 @@ import numpy as np
 
 from globals import ezfio
 
-from utils.atoms import atom_map
+from utils.atoms import atom_map, N_atom
 
 
 # ---
@@ -21,7 +21,7 @@ def get_jbh_c(jbh_size):
             r.append(f[p,a[0]])
     return r
 def set_jbh_c(x, jbh_size):
-    f = np.array(ezfio.get_jastrow_jbh_c()).T
+    f = np.zeros((jbh_size,N_atom), dtype=float)
     for i,a in enumerate(atom_map):
         for j in a:
             for p in range(jbh_size):

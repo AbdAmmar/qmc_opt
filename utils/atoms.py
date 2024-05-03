@@ -1,6 +1,8 @@
 
 from globals import ezfio
 
+from utils.utils import append_to_output
+
 # ---
 
 def make_atom_map():
@@ -20,10 +22,16 @@ def make_atom_map():
 
 atom_map = make_atom_map()
 
-atom_list = []
+N_atom = 0
+unique_atom_list = []
 all_atoms = ezfio.get_nuclei_nucl_label()
 for atoms in atom_map:
-    atom_list.append(all_atoms[atoms[0]])
+    unique_atom_list.append(all_atoms[atoms[0]])
+    N_atom += len(atoms)
+N_unique_atom = len(unique_atom_list)
+
+append_to_output(" nb of atoms = {}\n".format(N_atom))
+append_to_output(" nb of unique atoms = {}\n".format(N_unique_atom))
 
 # ---
 

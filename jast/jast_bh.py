@@ -13,7 +13,7 @@ from jast.jast_bh_param import set_jbh_m, set_jbh_n, set_jbh_o, set_jbh_c, set_j
 import globals
 from globals import ezfio
 
-from utils.atoms import atom_map, atom_list
+from utils.atoms import atom_map, unique_atom_list, N_unique_atom
 
 
 # ---
@@ -154,9 +154,21 @@ def init_jbh():
 
     exist = ezfio.has_jastrow_jbh_c()
     if(not exist):
-        c_random = [random.uniform(-1, 1) for _ in range(len(atom_map)*jbh_size)]
+        append_to_output(" jbh_c does not exist. A random initialisation is used.\n")
+        c_random = [random.uniform(-1, 1) for _ in range(N_unique_atom*jbh_size)]
+        for i,a in enumerate(atom_map):
+            j = a[0]
+            for p in range(jbh_size):
+                ii = i*jbh_size + p
+                if(jbh_m[ii] == jbh_n[ii] == 0):
+                    if(j == 0):
+                        if(p == 0):
+                            c_random[ii] = 0.5
+                    else:
+                        c_random[ii] = 0.0
         set_jbh_c(c_random, jbh_size)
     else:
+        append_to_output(" jbh_c does exist.\n")
         jbh_c = ezfio.get_jastrow_jbh_c()
     jbh_c = get_jbh_c(jbh_size)
 
@@ -236,7 +248,7 @@ def print_jbh():
     jbh_c = get_jbh_c(jbh_size)
 
     append_to_output("    m       n       o      ")
-    for atom in atom_list:
+    for atom in unique_atom_list:
         append_to_output(" c_{}         ".format(atom))
     append_to_output("\n")
 
@@ -246,7 +258,7 @@ def print_jbh():
         n = jbh_n[jj]
         o = jbh_o[jj]
         append_to_output(" {:4d}    {:4d}    {:4d}   ".format(m, n, o))
-        for ii in range(len(atom_list)):
+        for ii in range(N_unique_atom):
             i = ii*jbh_size+jj
             c = jbh_c[i]
             append_to_output(" {:+3.5f}    ".format(c))
