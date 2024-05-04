@@ -14,6 +14,7 @@ from utils.utils import append_to_output
 from jast.jast_mu_env_gauss import f_envSumGauss_j1eGauss
 from jast.jast_bh import f_jbh, init_jbh, vartc_jbh_vmc
 
+import globals
 from globals import ezfio, EZFIO_file
 from globals import do_scf
 from globals import optimize_orb, thresh_tcscf, n_it_tcscf_max
